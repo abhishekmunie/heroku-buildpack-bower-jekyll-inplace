@@ -15,12 +15,14 @@ BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 unset GIT_DIR
 
 # Load some convenience functions like status(), echo(), and indent()
-source $bp_dir/bin/common.sh
+source $BP_DIR/bin/common.sh
 
 # Temporary Directories ------------------------
 ruby_build_dir=$(mktemp -d -t ruby_build.XXXXXX)
 node_build_dir=$(mktemp -d -t node_build.XXXXXX)
 mkdir -p "$CACHE_DIR/bower-jekyll-inplace"
+
+cd $BUILD_DIR
 
 # Node Installation --------------------------
 status "Installing Node and build dependencies..."
