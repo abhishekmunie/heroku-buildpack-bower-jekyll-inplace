@@ -44,23 +44,23 @@ PATH="$BUILD_DIR/vendor/node/bin:$BUILD_DIR/bin:$BUILD_DIR/node_modules/.bin:$PA
 bower install --config.storage.packages=vendor/bower/packages --config.storage.registry=vendor/bower/registry --config.tmp=vendor/bower/tmp
 
 status "Setting environment variables..."
-export GEM_HOME=$BUILD_DIR/vendor/bundle/.gems
-export PATH=$BUILD_DIR/vendor/bundle/.gems/bin:$PATH
+export GEM_HOME=$BUILD_DIR/vendor/bundle/ruby/2.2.0/.gems
+export PATH=$BUILD_DIR/vendor/bundle/ruby/2.2.0/.gems/bin:$PATH
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF8
 
 # Install Jekyll into ruby_build_dir/.gems
 cat << EOF > ~/.gemrc
 gem: --no-ri --no-rdoc
-gemhome: $BUILD_DIR/vendor/bundle/.gems
+gemhome: $BUILD_DIR/vendor/bundle/ruby/2.2.0/.gems
 gempath:
-- $BUILD_DIR/vendor/bundle/.gems
+- $BUILD_DIR/vendor/bundle/ruby/2.2.0/.gems
 EOF
 
 status "Installing jekyll..."
 gem install jekyll
 
-ls -R $BUILD_DIR
+ls -aR $BUILD_DIR/.profile.d
 
 # Build Jekyll
 status "Compiling Jekyll site..."
