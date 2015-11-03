@@ -60,7 +60,8 @@ EOF
 status "Installing jekyll..."
 gem install jekyll
 
-ls -aR $BUILD_DIR/.profile.d
+cat $BUILD_DIR/.profile.d/ruby.sh
+cat $BUILD_DIR/.profile.d/nodejs.sh
 
 # Build Jekyll
 status "Compiling Jekyll site..."
