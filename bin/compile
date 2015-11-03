@@ -6,11 +6,10 @@ set -o pipefail   # don't ignore exit codes when piping output
 # set -x          # enable debugging
 
 # Configure directories
-build_dir=$1
-cache_dir=$2
-env_dir=$3
-
-bp_dir=$(cd $(dirname $0); cd ..; pwd)
+BUILD_DIR=${1:-}
+CACHE_DIR=${2:-}
+ENV_DIR=${3:-}
+BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 
 # clean up leaking environment
 unset GIT_DIR
@@ -21,23 +20,23 @@ source $bp_dir/bin/common.sh
 # Temporary Directories ------------------------
 ruby_build_dir=$(mktemp -d -t ruby_build.XXXXXX)
 node_build_dir=$(mktemp -d -t node_build.XXXXXX)
-mkdir -p "$cache_dir/bower-jekyll-inplace"
-
-# Ruby Installation --------------------------
-status "Installing Ruby and gem dependencies..."
-ruby_buildpack_dir=$(mktemp -d -t ruby.XXXXXX)
-git clone --quiet https://github.com/heroku/heroku-buildpack-ruby.git $ruby_buildpack_dir
-chmod -f +x $ruby_buildpack_dir/bin/{detect,compile,release} || true
-$ruby_buildpack_dir/bin/compile "$ruby_build_dir" "$cache_dir/bower-jekyll-inplace"
-rm -fr $ruby_buildpack_dir
+mkdir -p "$CACHE_DIR/bower-jekyll-inplace"
 
 # Node Installation --------------------------
 status "Installing Node and build dependencies..."
 node_buildpack_dir=$(mktemp -d -t node.XXXXXX)
 git clone --quiet https://github.com/heroku/heroku-buildpack-nodejs.git $node_buildpack_dir
 chmod -f +x $node_buildpack_dir/bin/{detect,compile,release} || true
-$node_buildpack_dir/bin/compile $node_build_dir $cache_dir/bower-jekyll-inplace
+$node_buildpack_dir/bin/compile $node_build_dir $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
 rm -fr $node_buildpack_dir
+
+# Ruby Installation --------------------------
+status "Installing Ruby and gem dependencies..."
+ruby_buildpack_dir=$(mktemp -d -t ruby.XXXXXX)
+git clone --quiet https://github.com/heroku/heroku-buildpack-ruby.git $ruby_buildpack_dir
+chmod -f +x $ruby_buildpack_dir/bin/{detect,compile,release} || true
+$ruby_buildpack_dir/bin/compile $ruby_build_dir $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
+rm -fr $ruby_buildpack_dir
 
 PATH="$node_build_dir/vendor/node/bin:$node_build_dir/bin:$node_build_dir/node_modules/.bin:$PATH" \
 bower install --config.storage.packages=vendor/bower/packages --config.storage.registry=vendor/bower/registry --config.tmp=vendor/bower/tmp
