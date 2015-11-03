@@ -29,18 +29,18 @@ status "Installing Node and build dependencies..."
 node_buildpack_dir=$(mktemp -d -t node.XXXXXX)
 git clone --quiet https://github.com/heroku/heroku-buildpack-nodejs.git $node_buildpack_dir
 chmod -f +x $node_buildpack_dir/bin/{detect,compile,release} || true
-$node_buildpack_dir/bin/compile $node_build_dir $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
+$node_buildpack_dir/bin/compile $BUILD_DIR $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
 rm -fr $node_buildpack_dir
 
 # Ruby Installation --------------------------
 status "Installing Ruby and gem dependencies..."
 ruby_buildpack_dir=$(mktemp -d -t ruby.XXXXXX)
-git clone --quiet https://github.com/heroku/heroku-buildpack-ruby.git $ruby_buildpack_dir
-chmod -f +x $ruby_buildpack_dir/bin/{detect,compile,release} || true
-$ruby_buildpack_dir/bin/compile $ruby_build_dir $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
-rm -fr $ruby_buildpack_dir
+git clone --quiet https://github.com/heroku/heroku-buildpack-ruby.git $BUILD_DIR
+chmod -f +x $BUILD_DIR/bin/{detect,compile,release} || true
+$BUILD_DIR/bin/compile $ruby_build_dir $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
+rm -fr $BUILD_DIR
 
-PATH="$node_build_dir/vendor/node/bin:$node_build_dir/bin:$node_build_dir/node_modules/.bin:$PATH" \
+PATH="$BUILD_DIR/vendor/node/bin:$BUILD_DIR/bin:$BUILD_DIR/node_modules/.bin:$PATH" \
 bower install --config.storage.packages=vendor/bower/packages --config.storage.registry=vendor/bower/registry --config.tmp=vendor/bower/tmp
 
 status "Setting environment variables..."
@@ -66,4 +66,4 @@ jekyll build | indent
 
 # Cleanup ------------------------------------
 rm -fr $ruby_build_dir
-rm -fr $node_build_dir
+rm -fr $BUILD_DIR
