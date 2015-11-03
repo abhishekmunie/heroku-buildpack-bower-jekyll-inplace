@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if [ -f $1/bower.json ] && [ -f $1/_config.yml ]; then
+  echo "Bower - Jekyll build"
+else
+  exit 1
+fi
