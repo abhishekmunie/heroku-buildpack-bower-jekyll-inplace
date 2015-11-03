@@ -24,14 +24,6 @@ mkdir -p "$CACHE_DIR/bower-jekyll-inplace"
 
 cd $BUILD_DIR
 
-# Node Installation --------------------------
-status "Installing Node and build dependencies..."
-node_buildpack_dir=$(mktemp -d -t node.XXXXXX)
-git clone --quiet https://github.com/heroku/heroku-buildpack-nodejs.git $node_buildpack_dir
-chmod -f +x $node_buildpack_dir/bin/{detect,compile,release} || true
-$node_buildpack_dir/bin/compile $BUILD_DIR $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
-rm -fr $node_buildpack_dir
-
 # Ruby Installation --------------------------
 status "Installing Ruby and gem dependencies..."
 ruby_buildpack_dir=$(mktemp -d -t ruby.XXXXXX)
@@ -39,6 +31,14 @@ git clone --quiet https://github.com/heroku/heroku-buildpack-ruby.git $BUILD_DIR
 chmod -f +x $BUILD_DIR/bin/{detect,compile,release} || true
 $BUILD_DIR/bin/compile $ruby_build_dir $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
 rm -fr $BUILD_DIR
+
+# Node Installation --------------------------
+status "Installing Node and build dependencies..."
+node_buildpack_dir=$(mktemp -d -t node.XXXXXX)
+git clone --quiet https://github.com/heroku/heroku-buildpack-nodejs.git $node_buildpack_dir
+chmod -f +x $node_buildpack_dir/bin/{detect,compile,release} || true
+$node_buildpack_dir/bin/compile $BUILD_DIR $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
+rm -fr $node_buildpack_dir
 
 PATH="$BUILD_DIR/vendor/node/bin:$BUILD_DIR/bin:$BUILD_DIR/node_modules/.bin:$PATH" \
 bower install --config.storage.packages=vendor/bower/packages --config.storage.registry=vendor/bower/registry --config.tmp=vendor/bower/tmp
