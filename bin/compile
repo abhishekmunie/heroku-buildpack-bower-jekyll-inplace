@@ -24,14 +24,6 @@ mkdir -p "$CACHE_DIR/bower-jekyll-inplace"
 
 cd $BUILD_DIR
 
-# Ruby Installation --------------------------
-status "Installing Ruby and gem dependencies..."
-ruby_buildpack_dir=$(mktemp -d -t ruby.XXXXXX)
-git clone --quiet https://github.com/heroku/heroku-buildpack-ruby.git $BUILD_DIR
-chmod -f +x $BUILD_DIR/bin/{detect,compile,release} || true
-$BUILD_DIR/bin/compile $ruby_build_dir $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
-rm -fr $BUILD_DIR
-
 # Node Installation --------------------------
 status "Installing Node and build dependencies..."
 node_buildpack_dir=$(mktemp -d -t node.XXXXXX)
@@ -40,21 +32,29 @@ chmod -f +x $node_buildpack_dir/bin/{detect,compile,release} || true
 $node_buildpack_dir/bin/compile $BUILD_DIR $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
 rm -fr $node_buildpack_dir
 
+# Ruby Installation --------------------------
+status "Installing Ruby and gem dependencies..."
+ruby_buildpack_dir=$(mktemp -d -t ruby.XXXXXX)
+git clone --quiet https://github.com/heroku/heroku-buildpack-ruby.git $ruby_buildpack_dir
+chmod -f +x $ruby_buildpack_dir/bin/{detect,compile,release} || true
+$ruby_buildpack_dir/bin/compile $BUILD_DIR $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
+rm -fr $ruby_buildpack_dir
+
 PATH="$BUILD_DIR/vendor/node/bin:$BUILD_DIR/bin:$BUILD_DIR/node_modules/.bin:$PATH" \
 bower install --config.storage.packages=vendor/bower/packages --config.storage.registry=vendor/bower/registry --config.tmp=vendor/bower/tmp
 
 status "Setting environment variables..."
-export GEM_HOME=$ruby_build_dir/.gems
-export PATH=$ruby_build_dir/.gems/bin:$PATH
+export GEM_HOME=$BUILD_DIR/.gems
+export PATH=$BUILD_DIR/.gems/bin:$PATH
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF8
 
 # Install Jekyll into ruby_build_dir/.gems
 cat << EOF > ~/.gemrc
 gem: --no-ri --no-rdoc
-gemhome: $ruby_build_dir/.gems
+gemhome: $BUILD_DIR/.gems
 gempath:
-- $ruby_build_dir/.gems
+- $BUILD_DIR/.gems
 EOF
 
 status "Installing jekyll..."
@@ -65,5 +65,5 @@ status "Compiling Jekyll site..."
 jekyll build | indent
 
 # Cleanup ------------------------------------
-rm -fr $ruby_build_dir
+rm -fr $BUILD_DIR
 rm -fr $BUILD_DIR
