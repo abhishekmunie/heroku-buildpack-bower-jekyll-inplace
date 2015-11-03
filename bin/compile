@@ -40,18 +40,13 @@ chmod -f +x $ruby_buildpack_dir/bin/{detect,compile,release} || true
 $ruby_buildpack_dir/bin/compile $BUILD_DIR $CACHE_DIR/bower-jekyll-inplace $ENV_DIR
 rm -fr $ruby_buildpack_dir
 
-PATH="$BUILD_DIR/vendor/node/bin:$BUILD_DIR/bin:$BUILD_DIR/node_modules/.bin:$PATH" \
-bower install --config.storage.packages=vendor/bower/packages --config.storage.registry=vendor/bower/registry --config.tmp=vendor/bower/tmp
-
-status "Setting environment..."
-source $BUILD_DIR/.profile.d/ruby.sh
+status "Installing Bower dependencies site..."
 source $BUILD_DIR/.profile.d/nodejs.sh
-
-status "Installing jekyll..."
-gem install jekyll
+bower install --config.storage.packages=vendor/bower/packages --config.storage.registry=vendor/bower/registry --config.tmp=vendor/bower/tmp
 
 # Build Jekyll
 status "Compiling Jekyll site..."
+source $BUILD_DIR/.profile.d/ruby.sh
 jekyll build | indent
 
 # Cleanup ------------------------------------
